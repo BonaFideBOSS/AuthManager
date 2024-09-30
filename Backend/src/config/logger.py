@@ -90,6 +90,8 @@ logger = get_logger(__name__, CustomFormatter('%(asctime)s'))
 
 def log(request, request_body, response, response_body, process_time):
     """Logger"""
+    if not request.url.path.startswith('/api'):
+        return
     if request.url.path in ["/api", "/openapi.json"]:
         response_body = b""
     info = {
