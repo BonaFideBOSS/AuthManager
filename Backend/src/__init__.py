@@ -11,7 +11,7 @@ from starlette.background import BackgroundTask
 
 from src.config.settings import Settings
 from src.config.database import init_db
-from src.config.logger import log
+#from src.config.logger import log
 from src.api import routes, tags_metadata
 from src.schemas.custom_response import CustomResponse
 
@@ -66,19 +66,19 @@ async def http_exception_handler(_, e: HTTPException):
 
 
 #@app.middleware('http')
-async def logger(request: Request, call_next):
-    """Middleware to log http requests and responses"""
-    start_time = time.time()
-    request_body = await request.body()
-    response = await call_next(request)
-    response_body = b""
-    async for chunk in response.body_iterator:
-        response_body += chunk
-    process_time = time.time()-start_time
-    log_task = BackgroundTask(
-        log, request, request_body, response, response_body, process_time)
-    return Response(content=response_body,
-                    status_code=response.status_code,
-                    headers=dict(response.headers),
-                    media_type=response.media_type,
-                    background=log_task)
+#async def logger(request: Request, call_next):
+#    """Middleware to log http requests and responses"""
+#    start_time = time.time()
+#    request_body = await request.body()
+#    response = await call_next(request)
+#    response_body = b""
+#    async for chunk in response.body_iterator:
+#        response_body += chunk
+#    process_time = time.time()-start_time
+#    log_task = BackgroundTask(
+#        log, request, request_body, response, response_body, process_time)
+#    return Response(content=response_body,
+#                    status_code=response.status_code,
+#                    headers=dict(response.headers),
+#                    media_type=response.media_type,
+#                    background=log_task)
