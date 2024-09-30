@@ -5,4 +5,4 @@ PyJWT
 pydantic-settings
 pydantic[email]
 python-multipart
-psycopg2-binary
+psycopg2
