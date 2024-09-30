@@ -65,7 +65,7 @@ async def http_exception_handler(_, e: HTTPException):
                         content=content.model_dump())
 
 
-@app.middleware('http')
+#@app.middleware('http')
 async def logger(request: Request, call_next):
     """Middleware to log http requests and responses"""
     start_time = time.time()
