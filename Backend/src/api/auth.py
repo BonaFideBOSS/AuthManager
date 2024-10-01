@@ -1,11 +1,10 @@
 from fastapi import APIRouter, Depends, HTTPException
-from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 
 from src.config.database import get_db
 from src.controllers.auth import AuthController
 from src.controllers.user import UserController
-from src.schemas.login import Login, LoginResponseModel
+from src.schemas.login import LoginForm, Login, LoginResponseModel
 from src.schemas.user import UserCreate
 from src.schemas.custom_response import CustomResponse, UserResponseModel
 
@@ -28,8 +27,7 @@ def register(user: UserCreate, db: Session = Depends(get_db)):
 
 
 @auth.post("/login/", response_model=LoginResponseModel)
-def login(form_data: OAuth2PasswordRequestForm = Depends(),
-          db: Session = Depends(get_db)):
+def login(form: LoginForm = Depends(), db: Session = Depends(get_db)):
     """
     API to let users log into the system
     they are first authenticated by username and password
@@ -37,13 +35,19 @@ def login(form_data: OAuth2PasswordRequestForm = Depends(),
     """
     try:
         auth_controller = AuthController()
-        user = auth_controller.authenticate_user(form_data.username,
-                                                 form_data.password,
+        user = auth_controller.authenticate_user(form.email,
+                                                 form.password,
                                                  db)
         if not user:
             raise ValueError("Invalid credentials")
 
-        data = {"user_id": user.id}
+        perms = [perm.name for role in user.roles for perm in role.permissions]
+        data = {
+            "user_id": user.id,
+            "username": user.username,
+            "email": user.email,
+            "permissions": perms
+        }
         access_token = auth_controller.create_access_token(data=data)
         return Login(access_token=access_token, user=user)
 

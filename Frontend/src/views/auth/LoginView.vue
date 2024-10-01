@@ -97,7 +97,7 @@ const login = handleSubmit(async (values) => {
   isLoading.value = true
   try {
     var data = new FormData()
-    data.append('username', values.email)
+    data.append('email', values.email)
     data.append('password', values.password)
 
     var response = await fetch(apis.login.url, {
