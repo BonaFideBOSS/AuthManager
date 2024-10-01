@@ -11,7 +11,7 @@ from starlette.background import BackgroundTask
 
 from src.config.settings import Settings
 from src.config.database import init_db
-#from src.config.logger import log
+# from src.config.logger import log
 from src.api import routes, tags_metadata
 from src.schemas.custom_response import CustomResponse
 
@@ -65,8 +65,8 @@ async def http_exception_handler(_, e: HTTPException):
                         content=content.model_dump())
 
 
-#@app.middleware('http')
-#async def logger(request: Request, call_next):
+# @app.middleware('http')
+# async def logger(request: Request, call_next):
 #    """Middleware to log http requests and responses"""
 #    start_time = time.time()
 #    request_body = await request.body()
