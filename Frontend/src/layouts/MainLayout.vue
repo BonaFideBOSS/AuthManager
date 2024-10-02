@@ -6,7 +6,7 @@
       <UserMenu v-if="!isMobile" />
     </v-app-bar>
 
-    <v-navigation-drawer color="grey-darken-4" v-model="navbarOpened" :rail="rail">
+    <v-navigation-drawer color="grey-darken-4" v-model="navbarOpened" :rail="rail" :scrim="false">
       <UserInfoListItem v-if="isMobile" />
       <v-divider />
       <v-list class="d-flex flex-column ga-1">
@@ -34,6 +34,13 @@
         </v-list>
       </template>
     </v-navigation-drawer>
+
+    <v-overlay
+      style="z-index: 1003"
+      v-if="isMobile"
+      v-model="navbarOpened"
+      scroll-strategy="block"
+    />
 
     <v-main>
       <v-container fluid>

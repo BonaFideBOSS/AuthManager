@@ -23,12 +23,14 @@
             class="mb-2"
             variant="outlined"
             clearable
+            persistent-clear
           />
 
           <v-select
             :prepend-inner-icon="mdiPaletteOutline"
             v-model="color.value.value"
             clearable
+            persistent-clear
             label="Color"
             :items="colors"
             variant="outlined"

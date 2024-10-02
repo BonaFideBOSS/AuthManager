@@ -48,7 +48,7 @@ class PermissionController:
             if query:
                 data = data.filter(or_(
                     func.lower(Permission.name).contains(query.lower()),
-                    func.lower(Permission.id).contains(query.lower())))
+                    Permission.id == query.lower()))
             if roles:
                 roles = roles.split(',')
                 data = data.filter(and_(*[or_(

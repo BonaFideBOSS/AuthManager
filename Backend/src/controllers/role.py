@@ -46,7 +46,7 @@ class RoleController:
             if query:
                 data = data.filter(or_(
                     func.lower(Role.name).contains(query.lower()),
-                    func.lower(Role.id).contains(query.lower())))
+                    Role.id == query.lower()))
             if roles:
                 roles = roles.split(',')
                 data = data.filter(or_(Role.name.in_(roles),

@@ -1,8 +1,5 @@
 <template>
-  <v-layout
-    :class="theme.currentTheme == 'light' && isBigScreen ? 'bg-teal-lighten-5' : ''"
-    min-height="100vh"
-  >
+  <v-layout class="h-100" :class="theme.currentTheme == 'light' && isBigScreen ? 'bg-teal-lighten-5' : ''">
     <div class="d-sm-flex justify-center align-center w-100">
       <slot></slot>
     </div>

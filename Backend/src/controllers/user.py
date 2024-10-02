@@ -61,7 +61,7 @@ class UserController:
             if query:
                 users = users.filter(or_(
                     func.lower(User.username).contains(query.lower()),
-                    func.lower(User.id).contains(query.lower()),
+                    User.id == query.lower(),
                     func.lower(User.email).contains(query.lower())))
             if roles:
                 roles = roles.split(',')

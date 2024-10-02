@@ -8,6 +8,7 @@
     label="Permissions"
     variant="outlined"
     clearable
+    persistent-clear
     :multiple="true"
     items-visibility-label="permissions"
     v-bind="props"

@@ -8,6 +8,7 @@
     label="Roles"
     variant="outlined"
     clearable
+    persistent-clear
     :multiple="true"
     items-visibility-label="roles"
     :items-visibility-count="1"

@@ -17,6 +17,7 @@
             label="Name"
             variant="outlined"
             clearable
+            persistent-clear
           />
         </v-card-text>
 

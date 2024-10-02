@@ -1,5 +1,11 @@
 <template>
-  <v-autocomplete v-model="model" v-on:update:search="filterItems" v-bind="props" clearable>
+  <v-autocomplete
+    v-model="model"
+    v-on:update:search="filterItems"
+    v-bind="props"
+    clearable
+    persistent-clear
+  >
     <template v-slot:prepend-item v-if="multiple">
       <SelectAllToggler
         v-model="model"

@@ -107,6 +107,7 @@
                 variant="outlined"
                 @click:append-inner="showPassword = !showPassword"
                 clearable
+                persistent-clear
               />
             </v-col>
 

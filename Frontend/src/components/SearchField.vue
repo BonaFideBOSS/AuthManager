@@ -8,6 +8,7 @@
     prepend-inner-icon="$search"
     hide-details
     clearable
+    persistent-clear
     @update:model-value="handleSearch"
     @click:clear="search = ''"
     v-bind="props"
