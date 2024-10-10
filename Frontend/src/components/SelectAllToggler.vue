@@ -17,13 +17,12 @@ import { computed } from 'vue'
 const selectedItems = defineModel({ default: [] })
 
 const props = defineProps({
-  items: {},
-  totalItemCount: {},
+  items: { default: [] },
   value: { default: null }
 })
 
 const areAllSelected = computed(() => {
-  return selectedItems.value.length === props.totalItemCount
+  return selectedItems.value.length === props.items.length
 })
 
 const areSomeSelected = computed(() => {

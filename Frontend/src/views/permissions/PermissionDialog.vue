@@ -18,6 +18,7 @@
             variant="outlined"
             clearable
             persistent-clear
+            :disabled="isLoading"
           />
         </v-card-text>
 

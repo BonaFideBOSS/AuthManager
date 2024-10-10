@@ -71,7 +71,12 @@
             </v-slide-y-transition>
 
             <v-col cols="12" class="mb-3" :class="{ 'text-center': !$vuetify.display.smAndUp }">
-              <v-btn @click="avatarDialog = true" text="Change avatar" variant="tonal" />
+              <v-btn
+                @click="avatarDialog = true"
+                text="Change avatar"
+                variant="tonal"
+                :disabled="isLoading"
+              />
             </v-col>
 
             <v-col cols="12">
@@ -81,6 +86,7 @@
                 :error-messages="username.errorMessage.value"
                 label="Username"
                 variant="outlined"
+                :disabled="isLoading"
               />
             </v-col>
 
@@ -92,6 +98,7 @@
                 type="email"
                 label="Email"
                 variant="outlined"
+                :disabled="isLoading"
               />
             </v-col>
 
@@ -108,6 +115,7 @@
                 @click:append-inner="showPassword = !showPassword"
                 clearable
                 persistent-clear
+                :disabled="isLoading"
               />
             </v-col>
 

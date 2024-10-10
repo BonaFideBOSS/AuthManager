@@ -1,5 +1,10 @@
 <template>
-  <v-dialog v-model="dialog" max-width="800" :fullscreen="!$vuetify.display.smAndUp" scrollable>
+  <v-dialog
+    v-model="dialog"
+    :max-width="$vuetify.display.smAndUp ? '800' : ''"
+    :fullscreen="!$vuetify.display.smAndUp"
+    scrollable
+  >
     <v-card :loading="isLoading" :rounded="$vuetify.display.smAndUp ? 'lg' : '0'">
       <v-card-title class="d-flex justify-space-between align-center">
         <div>Avatars</div>
@@ -15,13 +20,13 @@
             :key="avatar"
             @click="selectedAvatar = avatar"
             icon
-            :size="$vuetify.display.smAndUp ? '80' : '60'"
+            :size="$vuetify.display.xs ? '70' : '80'"
             variant="flat"
             :color="selectedAvatar == avatar ? 'green' : ''"
           >
             <v-avatar
               :image="`${apis.userAvatarURL}/${avatar}`"
-              :size="$vuetify.display.smAndUp ? '80' : '60'"
+              :size="$vuetify.display.xs ? '70' : '80'"
             />
           </v-btn>
         </div>

@@ -15,6 +15,7 @@
     "@vee-validate/rules": "^4.13.2",
     "pinia": "^2.1.7",
     "pinia-plugin-persistedstate": "^4.0.2",
+    "v-snackbars": "^3.2.8",
     "vee-validate": "^4.13.2",
     "vue": "^3.4.29",
     "vue-router": "^4.3.3",

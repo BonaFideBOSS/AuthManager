@@ -1,9 +1,12 @@
 from sqlalchemy.orm import Session
-from sqlalchemy import func, or_, and_
 
 from src.models.permission import Permission
 from src.models.role import Role
 from src.schemas.permission import PermissionCreate, PermissionUpdate
+from src.utils.database import (search_filter,
+                                sort_filter,
+                                multiple_match,
+                                multiple_match_relation)
 
 
 class PermissionController:
@@ -13,6 +16,7 @@ class PermissionController:
         self.db = db
 
     def read(self, permission_id: int):
+        """Get a single permission from the database"""
         permission = self.db.query(Permission).filter(
             Permission.id == permission_id).first()
         if not permission:
@@ -45,23 +49,23 @@ class PermissionController:
             data = self.db.query(Permission)
             pagination = {"total": 0, "filtered": 0}
             pagination['total'] = data.count()
+            search_cols = ['id', 'name']
             if query:
-                data = data.filter(or_(
-                    func.lower(Permission.name).contains(query.lower()),
-                    Permission.id == query.lower()))
+                data = data.filter(search_filter(search=query,
+                                                 model=Permission,
+                                                 cols=search_cols))
             if roles:
-                roles = roles.split(',')
-                data = data.filter(and_(*[or_(
-                    Permission.roles.any(Role.name == value),
-                    Permission.roles.any(Role.id == value))
-                    for value in roles]))
+                data = data.filter(multiple_match_relation(
+                    model=Permission,
+                    model_col='roles',
+                    relation=Role,
+                    match_cols=search_cols,
+                    query=roles))
             if perms:
-                perms = perms.split(',')
-                data = data.filter(or_(Permission.name.in_(perms),
-                                       Permission.id.in_(perms)))
-            sort_field = getattr(Permission, sort_by)
-            data = data.order_by(
-                sort_field.asc() if sort_order == "asc" else sort_field.desc())
+                data = data.filter(multiple_match(model=Permission,
+                                                  match_cols=search_cols,
+                                                  query=perms))
+            data = data.order_by(sort_filter(sort_by, sort_order, Permission))
             pagination['filtered'] = data.count()
             data = data.offset((page - 1) * limit).limit(limit).all()
             return data, pagination

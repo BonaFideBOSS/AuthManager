@@ -1,13 +1,15 @@
 from datetime import datetime, timezone
 
 from sqlalchemy.orm import Session
-from sqlalchemy import func, or_, and_
 
 from src.models.user import User
 from src.models.role import Role
 from src.models.user_role import UserRole
 from src.schemas.user import UserCreate, UserUpdateAdmin
 from src.utils.encryption import encrypt
+from src.utils.database import (search_filter,
+                                sort_filter,
+                                multiple_match_relation)
 
 
 class UserController:
@@ -59,19 +61,18 @@ class UserController:
             if exclude_deleted:
                 users = users.filter(User.deleted.is_(False))
             if query:
-                users = users.filter(or_(
-                    func.lower(User.username).contains(query.lower()),
-                    User.id == query.lower(),
-                    func.lower(User.email).contains(query.lower())))
+                search_cols = ['id', 'username', 'email']
+                users = users.filter(search_filter(search=query,
+                                                   model=User,
+                                                   cols=search_cols))
             if roles:
-                roles = roles.split(',')
-                users = users.filter(and_(*[or_(
-                    User.roles.any(Role.name == value),
-                    User.roles.any(Role.id == value))
-                    for value in roles]))
-            sort_field = getattr(User, sort_by)
-            users = users.order_by(
-                sort_field.asc() if sort_order == "asc" else sort_field.desc())
+                users = users.filter(multiple_match_relation(
+                    model=User,
+                    model_col='roles',
+                    relation=Role,
+                    match_cols=['name', 'id'],
+                    query=roles))
+            users = users.order_by(sort_filter(sort_by, sort_order, User))
             pagination['filtered'] = users.count()
             users = users.offset((page - 1) * limit).limit(limit).all()
             return users, pagination

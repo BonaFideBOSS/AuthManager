@@ -1,7 +1,7 @@
 <template>
   <v-dialog
     v-model="dialog"
-    max-width="600"
+    :max-width="$vuetify.display.smAndUp ? '600' : ''"
     :persistent="isLoading"
     :fullscreen="!$vuetify.display.smAndUp"
     scrollable
@@ -26,7 +26,12 @@
             </v-col>
 
             <v-col cols="12" sm="6" class="d-flex justify-center">
-              <v-btn @click="avatarDialog = true" text="Change avatar" variant="tonal" />
+              <v-btn
+                @click="avatarDialog = true"
+                text="Change avatar"
+                variant="tonal"
+                :disabled="isLoading"
+              />
             </v-col>
 
             <v-col cols="12" sm="6">
@@ -36,6 +41,7 @@
                 :error-messages="username.errorMessage.value"
                 label="Username"
                 variant="outlined"
+                :disabled="isLoading"
               />
             </v-col>
 
@@ -56,6 +62,7 @@
                 :error-messages="password.errorMessage.value"
                 label="Password"
                 variant="outlined"
+                :disabled="isLoading"
               />
             </v-col>
 
@@ -69,7 +76,8 @@
             :color="deleted.value.value ? 'red-accent-4' : ''"
             :label="`Deleted: ${deleted.value.value ? 'Yes' : 'No'}`"
             hide-details
-          ></v-switch>
+            :disabled="isLoading"
+          />
         </v-card-text>
 
         <v-divider />

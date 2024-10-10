@@ -1,10 +1,13 @@
 from sqlalchemy.orm import Session
-from sqlalchemy import func, or_, and_
 
 from src.models.role import Role
 from src.models.permission import Permission
 from src.models.role_permission import RolePermission
 from src.schemas.role import RoleCreate, RoleUpdate
+from src.utils.database import (search_filter,
+                                sort_filter,
+                                multiple_match,
+                                multiple_match_relation)
 
 
 class RoleController:
@@ -43,23 +46,23 @@ class RoleController:
             data = self.db.query(Role)
             pagination = {"total": 0, "filtered": 0}
             pagination['total'] = data.count()
+            search_cols = ['id', 'name']
             if query:
-                data = data.filter(or_(
-                    func.lower(Role.name).contains(query.lower()),
-                    Role.id == query.lower()))
+                data = data.filter(search_filter(search=query,
+                                                 model=Role,
+                                                 cols=search_cols))
             if roles:
-                roles = roles.split(',')
-                data = data.filter(or_(Role.name.in_(roles),
-                                       Role.id.in_(roles)))
+                data = data.filter(multiple_match(model=Role,
+                                                  match_cols=search_cols,
+                                                  query=roles))
             if perms:
-                perms = perms.split(',')
-                data = data.filter(and_(*[or_(
-                    Role.permissions.any(Permission.name == value),
-                    Role.permissions.any(Permission.id == value))
-                    for value in perms]))
-            sort_field = getattr(Role, sort_by)
-            data = data.order_by(
-                sort_field.asc() if sort_order == "asc" else sort_field.desc())
+                data = data.filter(multiple_match_relation(
+                    model=Role,
+                    model_col='permissions',
+                    relation=Permission,
+                    match_cols=search_cols,
+                    query=perms))
+            data = data.order_by(sort_filter(sort_by, sort_order, Role))
             pagination['filtered'] = data.count()
             data = data.offset((page - 1) * limit).limit(limit).all()
             return data, pagination

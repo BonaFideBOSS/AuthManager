@@ -1,7 +1,7 @@
 <template>
   <v-dialog
     v-model="dialog"
-    max-width="400"
+    :max-width="$vuetify.display.smAndUp ? '400' : ''"
     :persistent="isLoading"
     :fullscreen="!$vuetify.display.smAndUp"
   >
@@ -24,6 +24,7 @@
             variant="outlined"
             clearable
             persistent-clear
+            :disabled="isLoading"
           />
 
           <v-select
@@ -35,6 +36,7 @@
             :items="colors"
             variant="outlined"
             class="mb-2"
+            :disabled="isLoading"
           >
             <template v-slot:item="{ props, item }">
               <v-list-item v-bind="props">
@@ -54,7 +56,7 @@
             </template>
           </v-select>
 
-          <PermissionSelectField v-model="permissions.value.value" />
+          <PermissionSelectField v-model="permissions.value.value" :disabled="isLoading" />
         </v-card-text>
 
         <v-divider></v-divider>

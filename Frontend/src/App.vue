@@ -16,7 +16,6 @@ import { RouterView, useRoute, useRouter } from 'vue-router'
 import { notificationStore } from '@/stores/notification'
 import { authStore } from '@/stores/auth'
 import NotificationBar from '@/components/NotificationBar.vue'
-import { ref } from 'vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -50,8 +49,6 @@ window.fetch = async (...args) => {
     }
   }
 }
-
-const test = ref(true)
 </script>
 
 <style></style>

@@ -7,12 +7,7 @@
     persistent-clear
   >
     <template v-slot:prepend-item v-if="multiple">
-      <SelectAllToggler
-        v-model="model"
-        :items="filteredItems"
-        :total-item-count="items.length"
-        :value="itemValue"
-      />
+      <SelectAllToggler v-model="model" :items="filteredItems" :value="itemValue" />
     </template>
 
     <template v-slot:selection="{ item, index }">
