@@ -37,11 +37,16 @@
     </v-col>
   </v-row>
 
-  <v-toolbar>
-    <template v-if="actionsManyAllowed">
+  <DataTableToolbar
+    v-model="headers"
+    :is-loading="isLoading"
+    :refresh-action="getUsers"
+    :columns="columns"
+  >
+    <template v-slot:prepend v-if="actionsManyAllowed">
       <v-tooltip text="Delete selected users" v-if="canDeleteMany && selectedUsers.length > 0">
         <template v-slot:activator="{ props }">
-          <v-btn :disabled="isLoading" icon="$delete" @click="deleteUserMany" v-bind="props" />
+          <v-btn :disabled="isLoading" icon="$delete" @click="deleteMany" v-bind="props" />
         </template>
       </v-tooltip>
 
@@ -53,17 +58,11 @@
         thickness="2"
       />
     </template>
-
-    <v-tooltip text="Refresh">
-      <template v-slot:activator="{ props }">
-        <v-btn :disabled="isLoading" icon="$refresh" @click="getUsers" v-bind="props" />
-      </template>
-    </v-tooltip>
-  </v-toolbar>
+  </DataTableToolbar>
 
   <v-data-table-server
     loading-text="loading users..."
-    :headers="columns"
+    :headers="headers"
     :items="data"
     :items-length="filtered"
     v-model="selectedUsers"
@@ -72,6 +71,7 @@
     v-model:sort-by="sortBy"
     :loading="isLoading"
     @update:options="getUsers"
+    :disable-sort="isLoading"
     must-sort
     hover
     :show-select="actionsManyAllowed"
@@ -170,8 +170,13 @@
     </template>
   </v-data-table-server>
 
-  <UserDialog v-model="dialogUser" :user="selectedUser" :reload-function="getUsers" />
-  <UserDeleteDialog v-model="dialogDelete" :user="selectedUser" :reload-function="getUsers" />
+  <UserDialog v-model:dialog="dialogUser" v-model:user="selectedUser" :reload-function="getUsers" />
+  <UserDeleteDialog
+    v-model:dialog="dialogDelete"
+    v-model:user="selectedUser"
+    v-model:users="selectedUsers"
+    :reload-function="getUsers"
+  />
 </template>
 
 <script setup>
@@ -182,20 +187,21 @@ import { mdiDeleteSweepOutline } from '@mdi/js'
 
 import apis from '@/apis'
 import { authStore } from '@/stores/auth'
-import { notificationStore } from '@/stores/notification'
 import { canTakeActions, timelapse } from '@/utils'
+import DataTableToolbar from '@/components/DataTableToolbar.vue'
 import DataTablePagination from '@/components/DataTablePagination.vue'
 import SearchField from '@/components/SearchField.vue'
+
 import UserDialog from './UserDialog.vue'
 import UserDeleteDialog from './UserDeleteDialog.vue'
 import RoleSelectField from './RoleSelectField.vue'
 
 const route = useRoute()
 const auth = authStore()
-const notification = notificationStore()
 const date = useDate()
 
 const isLoading = ref(false)
+const headers = ref([])
 const data = ref([])
 const total = ref(0)
 const filtered = ref(0)
@@ -254,7 +260,7 @@ watchEffect(() => {
   if (auth.isLoggedIn) getUsers()
 })
 
-const selectedUser = ref({})
+const selectedUser = ref(null)
 const selectedUsers = ref([])
 const dialogUser = ref(false)
 const dialogDelete = ref(false)
@@ -276,23 +282,8 @@ function deleteUser(user) {
   dialogDelete.value = true
 }
 
-async function deleteUserMany() {
-  isLoading.value = true
-  try {
-    var response = await fetch(apis.userDeleteMany.url, {
-      method: apis.userDeleteMany.method,
-      headers: { Authorization: auth.token, 'Content-Type': 'application/json' },
-      body: JSON.stringify(selectedUsers.value)
-    })
-    response = await response.json()
-    notification.notify(response.message, 'success')
-    getUsers()
-    selectedUsers.value.length = 0
-  } catch (error) {
-    console.log(error)
-  } finally {
-    isLoading.value = false
-  }
+function deleteMany() {
+  dialogDelete.value = true
 }
 </script>
 

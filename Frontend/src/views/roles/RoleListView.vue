@@ -25,38 +25,39 @@
     </v-col>
   </v-row>
 
-  <v-toolbar>
-    <template v-if="actionsManyAllowed">
-      <v-tooltip text="Delete selected roles" v-if="canDeleteMany && selectedRoles.length > 0">
+  <DataTableToolbar
+    v-model="headers"
+    :is-loading="isLoading"
+    :refresh-action="getRoles"
+    :columns="columns"
+  >
+    <template v-slot:prepend>
+      <template v-if="actionsManyAllowed">
+        <v-tooltip text="Delete selected roles" v-if="canDeleteMany && selectedRoles.length > 0">
+          <template v-slot:activator="{ props }">
+            <v-btn :disabled="isLoading" icon="$delete" @click="deleteMany" v-bind="props" />
+          </template>
+        </v-tooltip>
+        <v-divider
+          v-if="selectedRoles.length > 0"
+          class="mx-3 align-self-center"
+          vertical
+          length="24"
+          thickness="2"
+        />
+      </template>
+
+      <v-tooltip text="Create new role" v-if="canCreate">
         <template v-slot:activator="{ props }">
-          <v-btn :disabled="isLoading" icon="$delete" @click="deleteRoleMany" v-bind="props" />
+          <v-btn icon="$plus" @click="createRole" v-bind="props" :disabled="isLoading" />
         </template>
       </v-tooltip>
-      <v-divider
-        v-if="selectedRoles.length > 0"
-        class="mx-3 align-self-center"
-        vertical
-        length="24"
-        thickness="2"
-      />
     </template>
-
-    <v-tooltip text="Create new role" v-if="canCreate">
-      <template v-slot:activator="{ props }">
-        <v-btn icon="$plus" @click="createRole" v-bind="props" :disabled="isLoading" />
-      </template>
-    </v-tooltip>
-
-    <v-tooltip text="Refresh">
-      <template v-slot:activator="{ props }">
-        <v-btn icon="$refresh" @click="getRoles" v-bind="props" :disabled="isLoading" />
-      </template>
-    </v-tooltip>
-  </v-toolbar>
+  </DataTableToolbar>
 
   <v-data-table-server
     loading-text="loading roles..."
-    :headers="columns"
+    :headers="headers"
     :items="data"
     :items-length="filtered"
     v-model="selectedRoles"
@@ -65,6 +66,7 @@
     v-model:sort-by="sortBy"
     :loading="isLoading"
     @update:options="getRoles"
+    :disable-sort="isLoading"
     must-sort
     hover
     :show-select="actionsManyAllowed"
@@ -154,8 +156,13 @@
     </template>
   </v-data-table-server>
 
-  <RoleDialog v-model="dialogRole" :role="selectedRole" :reload-function="getRoles" />
-  <RoleDeleteDialog v-model="dialogDelete" :role="selectedRole" :reload-function="getRoles" />
+  <RoleDialog v-model:dialog="dialogRole" v-model:role="selectedRole" :reload-function="getRoles" />
+  <RoleDeleteDialog
+    v-model:dialog="dialogDelete"
+    v-model:role="selectedRole"
+    v-model:roles="selectedRoles"
+    :reload-function="getRoles"
+  />
 </template>
 
 <script setup>
@@ -165,10 +172,11 @@ import { useDate } from 'vuetify/lib/framework.mjs'
 
 import apis from '@/apis'
 import { authStore } from '@/stores/auth'
-import { notificationStore } from '@/stores/notification'
 import { canTakeActions, timelapse } from '@/utils'
+import DataTableToolbar from '@/components/DataTableToolbar.vue'
 import DataTablePagination from '@/components/DataTablePagination.vue'
 import SearchField from '@/components/SearchField.vue'
+
 import RoleDialog from './RoleDialog.vue'
 import RoleDeleteDialog from './RoleDeleteDialog.vue'
 import PermissionSelectField from './PermissionSelectField.vue'
@@ -176,9 +184,9 @@ import PermissionSelectField from './PermissionSelectField.vue'
 const route = useRoute()
 const auth = authStore()
 const date = useDate()
-const notification = notificationStore()
 
 const isLoading = ref(false)
+const headers = ref([])
 const data = ref([])
 const total = ref(0)
 const filtered = ref(0)
@@ -257,23 +265,8 @@ function deleteRole(role) {
   dialogDelete.value = true
 }
 
-async function deleteRoleMany() {
-  isLoading.value = true
-  try {
-    var response = await fetch(apis.roleDeleteMany.url, {
-      method: apis.roleDeleteMany.method,
-      headers: { Authorization: auth.token, 'Content-Type': 'application/json' },
-      body: JSON.stringify(selectedRoles.value)
-    })
-    response = await response.json()
-    notification.notify(response.message, 'success')
-    getRoles()
-    selectedRoles.value.length = 0
-  } catch (error) {
-    console.log(error)
-  } finally {
-    isLoading.value = false
-  }
+function deleteMany() {
+  dialogDelete.value = true
 }
 </script>
 

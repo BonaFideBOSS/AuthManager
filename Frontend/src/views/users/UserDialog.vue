@@ -52,6 +52,7 @@
                 :error-messages="email.errorMessage.value"
                 label="Email"
                 variant="outlined"
+                :disabled="isLoading"
               />
             </v-col>
 
@@ -67,7 +68,7 @@
             </v-col>
 
             <v-col cols="12" sm="6">
-              <RoleSelectField v-model="roles.value.value" />
+              <RoleSelectField v-model="roles.value.value" :disabled="isLoading" />
             </v-col>
           </v-row>
 
@@ -113,11 +114,11 @@ import RoleSelectField from './RoleSelectField.vue'
 const auth = authStore()
 const notification = notificationStore()
 
-const dialog = defineModel()
+const dialog = defineModel('dialog')
+const user = defineModel('user')
 const avatarDialog = ref(false)
 
 const props = defineProps({
-  user: { default: null },
   reloadFunction: {}
 })
 
@@ -140,11 +141,12 @@ const isLoading = ref(false)
 const isNewUser = ref(false)
 
 watch(dialog, (val) => {
-  if (val && props.user) {
-    setValues(props.user)
-    roles.setValue(props.user.roles.map((role) => role.id))
+  if (val && user.value) {
+    setValues(user.value)
+    roles.setValue(user.value.roles.map((role) => role.id))
     isNewUser.value = false
   } else {
+    user.value = null
     handleReset()
     roles.resetField({ value: [] })
     isNewUser.value = true
@@ -154,13 +156,13 @@ watch(dialog, (val) => {
 const createUser = handleSubmit(async (values) => {
   isLoading.value = true
   try {
-    var response = await fetch(apis.userCreate.url, {
-      method: apis.userCreate.method,
-      headers: { Authorization: auth.token, 'Content-Type': 'application/json' },
-      body: JSON.stringify(values)
-    })
-    response = await response.json()
-    notification.notify(response.message, 'success')
+    // var response = await fetch(apis.userCreate.url, {
+    //   method: apis.userCreate.method,
+    //   headers: { Authorization: auth.token, 'Content-Type': 'application/json' },
+    //   body: JSON.stringify(values)
+    // })
+    // response = await response.json()
+    // notification.notify(response.message, 'success')
     dialog.value = false
     props.reloadFunction()
   } catch (error) {
@@ -173,7 +175,7 @@ const createUser = handleSubmit(async (values) => {
 const updateUser = handleSubmit(async (values) => {
   isLoading.value = true
   try {
-    const user_id = props.user?.id
+    const user_id = user.value?.id
     var response = await fetch(`${apis.userUpdate.url}?user_id=${user_id}`, {
       method: apis.userUpdate.method,
       headers: { Authorization: auth.token, 'Content-Type': 'application/json' },

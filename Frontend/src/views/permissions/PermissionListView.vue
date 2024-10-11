@@ -25,46 +25,42 @@
     </v-col>
   </v-row>
 
-  <v-toolbar>
-    <template v-if="actionsManyAllowed">
-      <v-tooltip
-        text="Delete selected permissions"
-        v-if="canDeleteMany && selectedPermissions.length > 0"
-      >
+  <DataTableToolbar
+    v-model="headers"
+    :is-loading="isLoading"
+    :refresh-action="getPermissions"
+    :columns="columns"
+  >
+    <template v-slot:prepend>
+      <template v-if="actionsManyAllowed">
+        <v-tooltip
+          text="Delete selected permissions"
+          v-if="canDeleteMany && selectedPermissions.length > 0"
+        >
+          <template v-slot:activator="{ props }">
+            <v-btn :disabled="isLoading" icon="$delete" @click="deleteMany" v-bind="props" />
+          </template>
+        </v-tooltip>
+        <v-divider
+          v-if="selectedPermissions.length > 0"
+          class="mx-3 align-self-center"
+          vertical
+          length="24"
+          thickness="2"
+        />
+      </template>
+
+      <v-tooltip text="Create new role" v-if="canCreate">
         <template v-slot:activator="{ props }">
-          <v-btn
-            :disabled="isLoading"
-            icon="$delete"
-            @click="deletePermissionMany"
-            v-bind="props"
-          />
+          <v-btn icon="$plus" @click="createPermission" v-bind="props" :disabled="isLoading" />
         </template>
       </v-tooltip>
-      <v-divider
-        v-if="selectedPermissions.length > 0"
-        class="mx-3 align-self-center"
-        vertical
-        length="24"
-        thickness="2"
-      />
     </template>
-
-    <v-tooltip text="Create new role" v-if="canCreate">
-      <template v-slot:activator="{ props }">
-        <v-btn icon="$plus" @click="createPermission" v-bind="props" :disabled="isLoading" />
-      </template>
-    </v-tooltip>
-
-    <v-tooltip text="Refresh">
-      <template v-slot:activator="{ props }">
-        <v-btn icon="$refresh" @click="getPermissions" v-bind="props" :disabled="isLoading" />
-      </template>
-    </v-tooltip>
-  </v-toolbar>
+  </DataTableToolbar>
 
   <v-data-table-server
     loading-text="loading permissions..."
-    :headers="columns"
+    :headers="headers"
     :items="data"
     :items-length="filtered"
     v-model="selectedPermissions"
@@ -73,6 +69,7 @@
     v-model:sort-by="sortBy"
     :loading="isLoading"
     @update:options="getPermissions"
+    :disable-sort="isLoading"
     must-sort
     hover
     :show-select="actionsManyAllowed"
@@ -158,13 +155,14 @@
   </v-data-table-server>
 
   <PermissionDialog
-    v-model="dialogPermission"
-    :permission="selectedPermission"
+    v-model:dialog="dialogPermission"
+    v-model:permission="selectedPermission"
     :reload-function="getPermissions"
   />
   <PermissionDeleteDialog
-    v-model="dialogDelete"
-    :permission="selectedPermission"
+    v-model:dialog="dialogDelete"
+    v-model:permission="selectedPermission"
+    v-model:permissions="selectedPermissions"
     :reload-function="getPermissions"
   />
 </template>
@@ -178,8 +176,10 @@ import apis from '@/apis'
 import { authStore } from '@/stores/auth'
 import { notificationStore } from '@/stores/notification'
 import { canTakeActions, timelapse } from '@/utils'
+import DataTableToolbar from '@/components/DataTableToolbar.vue'
 import DataTablePagination from '@/components/DataTablePagination.vue'
 import SearchField from '@/components/SearchField.vue'
+
 import PermissionDialog from './PermissionDialog.vue'
 import PermissionDeleteDialog from './PermissionDeleteDialog.vue'
 import RoleSelectField from '@/views/users/RoleSelectField.vue'
@@ -190,6 +190,7 @@ const notification = notificationStore()
 const date = useDate()
 
 const isLoading = ref(false)
+const headers = ref([])
 const data = ref([])
 const total = ref(0)
 const filtered = ref(0)
@@ -268,23 +269,8 @@ function deletePermission(permission) {
   dialogDelete.value = true
 }
 
-async function deletePermissionMany() {
-  isLoading.value = true
-  try {
-    var response = await fetch(apis.permissioneleteMany.url, {
-      method: apis.permissioneleteMany.method,
-      headers: { Authorization: auth.token, 'Content-Type': 'application/json' },
-      body: JSON.stringify(selectedPermissions.value)
-    })
-    response = await response.json()
-    notification.notify(response.message, 'success')
-    getPermissions()
-    selectedPermissions.value.length = 0
-  } catch (error) {
-    console.log(error)
-  } finally {
-    isLoading.value = false
-  }
+function deleteMany() {
+  dialogDelete.value = true
 }
 </script>
 

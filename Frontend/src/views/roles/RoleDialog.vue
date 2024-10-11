@@ -89,10 +89,10 @@ import { mdiAccountLockOutline, mdiPaletteOutline } from '@mdi/js'
 const auth = authStore()
 const notification = notificationStore()
 
-const dialog = defineModel()
+const dialog = defineModel('dialog')
+const role = defineModel('role')
 
 const props = defineProps({
-  role: { default: null },
   reloadFunction: {}
 })
 
@@ -114,11 +114,12 @@ const isLoading = ref(false)
 const isNewRole = ref(false)
 
 watch(dialog, (val) => {
-  if (val && props.role) {
-    setValues(props.role)
-    permissions.setValue(props.role.permissions.map((perm) => perm.id))
+  if (val && role.value) {
+    setValues(role.value)
+    permissions.setValue(role.value.permissions.map((perm) => perm.id))
     isNewRole.value = false
   } else {
+    role.value = null
     handleReset()
     permissions.resetField({ value: [] })
     isNewRole.value = true
@@ -147,7 +148,7 @@ const createRole = handleSubmit(async (values) => {
 const updateRole = handleSubmit(async (values) => {
   isLoading.value = true
   try {
-    const role_id = props.role?.id
+    const role_id = role.value?.id
     var response = await fetch(`${apis.roleUpdate.url}?role_id=${role_id}`, {
       method: apis.roleUpdate.method,
       headers: { Authorization: auth.token, 'Content-Type': 'application/json' },

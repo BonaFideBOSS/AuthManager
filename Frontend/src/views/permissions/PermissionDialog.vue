@@ -51,10 +51,10 @@ import { mdiLockOutline } from '@mdi/js'
 const auth = authStore()
 const notification = notificationStore()
 
-const dialog = defineModel()
+const dialog = defineModel('dialog')
+const permission = defineModel('permission')
 
 const props = defineProps({
-  permission: { default: null },
   reloadFunction: {}
 })
 
@@ -70,10 +70,11 @@ const isLoading = ref(false)
 const isNewPermission = ref(false)
 
 watch(dialog, (val) => {
-  if (val && props.permission) {
-    name.setValue(props.permission.name)
+  if (val && permission.value) {
+    name.setValue(permission.value.name)
     isNewPermission.value = false
   } else {
+    permission.value = null
     name.resetField()
     isNewPermission.value = true
   }
@@ -101,7 +102,7 @@ const createPermission = handleSubmit(async (values) => {
 const updatePermission = handleSubmit(async (values) => {
   isLoading.value = true
   try {
-    const permission_id = props.permission?.id
+    const permission_id = permission.value?.id
     var response = await fetch(`${apis.permissionUpdate.url}?permission_id=${permission_id}`, {
       method: apis.permissionUpdate.method,
       headers: { Authorization: auth.token, 'Content-Type': 'application/json' },
