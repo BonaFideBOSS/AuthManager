@@ -1,12 +1,13 @@
 <template>
   <v-dialog v-model="dialog" max-width="400" :persistent="isLoading">
     <v-card
-      :title="`Delete ${role ? 'Permission' : 'Permissions'}`"
+      :title="`Delete ${permission ? 'Permission' : 'Permissions'}`"
       :loading="isLoading"
       rounded="lg"
     >
       <v-card-text>
-        Are you sure you want to delete {{ role ? 'this permission' : 'the selected permissions' }}?
+        Are you sure you want to delete
+        {{ permission ? 'this permission' : 'the selected permissions' }}?
       </v-card-text>
       <v-card-actions class="ma-2">
         <v-btn text="Cancel" @click="dialog = false" :disabled="isLoading" />
