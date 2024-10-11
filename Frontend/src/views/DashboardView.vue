@@ -6,16 +6,26 @@
     </h1>
   </div>
 
-  <v-row>
-    <v-col cols="12" sm="6" md="4" v-for="i in dbCount" :key="i.table">
-      <v-card variant="outlined" color="secondary" border="sm" rounded="xl" :to="{ name: i.table }">
-        <v-card-text class="px-md-10 px-sm-7">
-          <div class="d-flex justify-space-between align-center">
-            <v-card-title class="ps-0 text-capitalize d-flex align-center ga-3">
-              <v-icon :icon="dbCountIcon[i.table]" size="x-large" />
-              <span>{{ i.table }}</span>
+  <v-row dense>
+    <v-col cols="12" sm="6" md="4" v-for="(value, key, index) in tables" :key="index">
+      <v-skeleton-loader type="image" v-if="!dbCount" />
+      <v-card
+        v-if="dbCount"
+        variant="outlined"
+        color="secondary"
+        border="sm"
+        rounded="xl"
+        :to="{ name: key }"
+      >
+        <v-card-text class="px-sm-5">
+          <div class="d-flex ga-2 justify-space-between align-center">
+            <v-card-title class="px-0 text-capitalize d-flex align-center ga-3 opacity-100">
+              <v-icon :icon="value" />
+              <span>{{ key }}</span>
             </v-card-title>
-            <v-card-title class="text-h3 pe-0">{{ i.count }}</v-card-title>
+            <v-card-title class="text-h4 px-0">
+              {{ dbCount.find((c) => c.table == key).count }}
+            </v-card-title>
           </div>
         </v-card-text>
       </v-card>
@@ -24,17 +34,18 @@
 </template>
 
 <script setup>
+import { ref } from 'vue'
+import { useRoute } from 'vue-router'
+
 import apis from '@/apis'
 import { authStore } from '@/stores/auth'
 import { mdiAccountLock, mdiAccountMultiple, mdiLock } from '@mdi/js'
-import { ref } from 'vue'
-import { useRoute } from 'vue-router'
 
 const route = useRoute()
 const auth = authStore()
 
 const dbCount = ref()
-const dbCountIcon = { users: mdiAccountMultiple, roles: mdiAccountLock, permissions: mdiLock }
+const tables = ref({ users: mdiAccountMultiple, roles: mdiAccountLock, permissions: mdiLock })
 
 async function getDbCount() {
   try {

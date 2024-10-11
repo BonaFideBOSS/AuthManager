@@ -10,10 +10,10 @@ settings = Settings()
 LOG_FILE_PATH = settings.LOG_FILE_PATH
 
 
-def get_file_handler(formatter, log_filename):
+def get_file_handler(formatter):
     """Log file handler"""
-    file_handler = logging.FileHandler(log_filename)
-    file_handler.setLevel(logging.DEBUG)
+    file_handler = logging.FileHandler(LOG_FILE_PATH)
+    file_handler.setLevel(logging.INFO)
     file_handler.setFormatter(formatter)
     return file_handler
 
@@ -21,18 +21,18 @@ def get_file_handler(formatter, log_filename):
 def get_stream_handler(formatter):
     """Streaming data handler"""
     stream_handler = logging.StreamHandler(sys.stdout)
-    stream_handler.setLevel(logging.DEBUG)
+    stream_handler.setLevel(logging.INFO)
     stream_handler.setFormatter(formatter)
     return stream_handler
 
 
-def get_logger(name, formatter, log_filename=LOG_FILE_PATH):
+def get_logger(name, formatter):
     """Return custom logger"""
-    logger = logging.getLogger(name)
-    logger.setLevel(logging.DEBUG)
-    logger.addHandler(get_file_handler(formatter, log_filename))
-    logger.addHandler(get_stream_handler(formatter))
-    return logger
+    _logger = logging.getLogger(name)
+    _logger.setLevel(logging.INFO)
+    # logger.addHandler(get_file_handler(formatter, log_filename))
+    _logger.addHandler(get_stream_handler(formatter))
+    return _logger
 
 
 def create_log(record):
