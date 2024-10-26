@@ -44,7 +44,11 @@
     :columns="columns"
   >
     <template v-slot:prepend v-if="actionsManyAllowed">
-      <v-tooltip text="Delete selected users" v-if="canDeleteMany && selectedUsers.length > 0">
+      <v-tooltip
+        open-on-click
+        text="Delete selected users"
+        v-if="canDeleteMany && selectedUsers.length > 0"
+      >
         <template v-slot:activator="{ props }">
           <v-btn :disabled="isLoading" icon="$delete" @click="deleteMany" v-bind="props" />
         </template>
@@ -131,19 +135,20 @@
     <template v-slot:item.created_at="{ value }">
       <span class="text-no-wrap">
         {{ timelapse(value) }}
-        <v-tooltip activator="parent" :text="date.format(value, 'fullDateTime12h')" />
+        <v-tooltip activator="parent" :text="date.format(value, 'fullDateTime12h')" open-on-click />
       </span>
     </template>
 
     <template v-slot:item.updated_at="{ value }">
       <span class="text-no-wrap">
         {{ timelapse(value) }}
-        <v-tooltip activator="parent" :text="date.format(value, 'fullDateTime12h')" />
+        <v-tooltip activator="parent" :text="date.format(value, 'fullDateTime12h')" open-on-click />
       </span>
     </template>
 
     <template v-slot:item.deleted="{ item }">
       <v-tooltip
+        open-on-click
         :text="item.deleted ? date.format(item.deleted_at, 'fullDateTime12h') : 'Not deleted'"
       >
         <template v-slot:activator="{ props }">

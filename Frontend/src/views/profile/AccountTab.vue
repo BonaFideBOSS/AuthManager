@@ -49,7 +49,7 @@
                   <span>{{ i.at(0) }}</span>
                 </template>
                 <template v-slot:append>
-                  <v-tooltip location="left" :text="date.format(i.at(1), 'fullDateTime12h')">
+                  <v-tooltip open-on-click location="left" :text="date.format(i.at(1), 'fullDateTime12h')">
                     <template v-slot:activator="{ props }">
                       <span v-bind="props" v-text="timelapse(i.at(1))"></span>
                     </template>

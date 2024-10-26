@@ -2,7 +2,7 @@
   <v-toolbar>
     <slot name="prepend"></slot>
 
-    <v-tooltip text="Refresh">
+    <v-tooltip text="Refresh" open-on-click>
       <template v-slot:activator="{ props }">
         <v-btn :disabled="isLoading" icon="$refresh" @click="refreshAction" v-bind="props" />
       </template>
@@ -20,7 +20,7 @@
           </template>
         </v-tooltip>
       </template>
-      <v-list density="compact" max-height="300">
+      <v-list density="compact" min-width="250" max-width="300" max-height="300">
         <SelectAllToggler v-model="selectedHeaders" :items="[...Array(columns.length).keys()]" />
         <v-item-group multiple v-model="selectedHeaders">
           <v-item v-for="(col, index) in columns" :key="index" v-slot="{ isSelected, toggle }">

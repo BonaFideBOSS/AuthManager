@@ -33,7 +33,11 @@
   >
     <template v-slot:prepend>
       <template v-if="actionsManyAllowed">
-        <v-tooltip text="Delete selected roles" v-if="canDeleteMany && selectedRoles.length > 0">
+        <v-tooltip
+          open-on-click
+          text="Delete selected roles"
+          v-if="canDeleteMany && selectedRoles.length > 0"
+        >
           <template v-slot:activator="{ props }">
             <v-btn :disabled="isLoading" icon="$delete" @click="deleteMany" v-bind="props" />
           </template>
@@ -47,7 +51,7 @@
         />
       </template>
 
-      <v-tooltip text="Create new role" v-if="canCreate">
+      <v-tooltip open-on-click text="Create new role" v-if="canCreate">
         <template v-slot:activator="{ props }">
           <v-btn icon="$plus" @click="createRole" v-bind="props" :disabled="isLoading" />
         </template>
@@ -104,7 +108,7 @@
     </template>
 
     <template v-slot:item.permissions="{ value }">
-      <v-menu open-on-hover>
+      <v-menu open-on-hover open-on-click>
         <template v-slot:activator="{ props }">
           <v-chip v-bind="props" link>{{ value.length }}</v-chip>
         </template>
@@ -132,14 +136,14 @@
     <template v-slot:item.created_at="{ value }">
       <span class="text-no-wrap">
         {{ timelapse(value) }}
-        <v-tooltip activator="parent" :text="date.format(value, 'fullDateTime12h')"></v-tooltip>
+        <v-tooltip activator="parent" :text="date.format(value, 'fullDateTime12h')" open-on-click />
       </span>
     </template>
 
     <template v-slot:item.updated_at="{ value }">
       <span class="text-no-wrap">
         {{ timelapse(value) }}
-        <v-tooltip activator="parent" :text="date.format(value, 'fullDateTime12h')"></v-tooltip>
+        <v-tooltip activator="parent" :text="date.format(value, 'fullDateTime12h')" open-on-click />
       </span>
     </template>
 
