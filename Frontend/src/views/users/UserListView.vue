@@ -44,15 +44,15 @@
     :columns="columns"
   >
     <template v-slot:prepend v-if="actionsManyAllowed">
-      <v-tooltip
-        open-on-click
-        text="Delete selected users"
+      <DataTableActionButton
         v-if="canDeleteMany && selectedUsers.length > 0"
-      >
-        <template v-slot:activator="{ props }">
-          <v-btn :disabled="isLoading" icon="$delete" @click="deleteMany" v-bind="props" />
-        </template>
-      </v-tooltip>
+        tooltip-label="Delete selected users"
+        :is-loading="isLoading"
+        @click="deleteMany"
+        icon="$delete"
+        size="default"
+        :change-color-on-hover="false"
+      />
 
       <v-divider
         v-if="selectedUsers.length > 0"
@@ -83,32 +83,21 @@
   >
     <template v-slot:item.actions="{ item }">
       <div class="text-no-wrap">
-        <v-hover v-if="canUpdate">
-          <template v-slot:default="{ isHovering, props }">
-            <v-btn
-              :disabled="isLoading"
-              v-bind="props"
-              :color="isHovering ? 'primary' : ''"
-              icon="$edit"
-              @click="editUser(item)"
-              variant="text"
-              size="small"
-            />
-          </template>
-        </v-hover>
-        <v-hover v-if="canDelete && !item.deleted">
-          <template v-slot:default="{ isHovering, props }">
-            <v-btn
-              :disabled="isLoading"
-              v-bind="props"
-              icon="$delete"
-              @click="deleteUser(item)"
-              variant="text"
-              :color="isHovering ? 'red-accent-4' : ''"
-              size="small"
-            />
-          </template>
-        </v-hover>
+        <DataTableActionButton
+          v-if="canUpdate"
+          tooltip-label="Edit"
+          :is-loading="isLoading"
+          @click="editUser(item)"
+          icon="$edit"
+        />
+        <DataTableActionButton
+          v-if="canDelete && !item.deleted"
+          tooltip-label="Delete"
+          :is-loading="isLoading"
+          @click="deleteUser(item)"
+          icon="$delete"
+          color-on-hover="red"
+        />
       </div>
     </template>
 
@@ -195,6 +184,7 @@ import { authStore } from '@/stores/auth'
 import { canTakeActions, timelapse } from '@/utils'
 import DataTableToolbar from '@/components/DataTableToolbar.vue'
 import DataTablePagination from '@/components/DataTablePagination.vue'
+import DataTableActionButton from '@/components/DataTableActionButton.vue'
 import SearchField from '@/components/SearchField.vue'
 
 import UserDialog from './UserDialog.vue'

@@ -146,6 +146,7 @@ class UserController:
                         raise ValueError(f"Role with id '{role_id}' not found")
                     user_role = UserRole(user_id=user.id, role_id=role.id)
                     self.db.add(user_role)
+                user.updated_at = datetime.now(timezone.utc)
 
             self.db.commit()
             self.db.refresh(user)

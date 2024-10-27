@@ -1,3 +1,5 @@
+from datetime import datetime, timezone
+
 from sqlalchemy.orm import Session
 
 from src.models.role import Role
@@ -122,6 +124,7 @@ class RoleController:
                 role.color = new_details.color
             if hasattr(new_details, 'permissions'):
                 self.update_role_permissions(role, new_details.permissions)
+                role.updated_at = datetime.now(timezone.utc)
             self.db.commit()
             self.db.refresh(role)
             return role

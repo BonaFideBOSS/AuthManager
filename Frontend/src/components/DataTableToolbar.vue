@@ -26,9 +26,7 @@
           <v-item v-for="(col, index) in columns" :key="index" v-slot="{ isSelected, toggle }">
             <v-list-item @click="toggle">
               <template v-slot:prepend>
-                <v-list-item-action>
-                  <v-checkbox :model-value="isSelected" hide-details density="compact" />
-                </v-list-item-action>
+                <v-checkbox-btn :model-value="isSelected" hide-details />
               </template>
               <v-list-item-title>{{ col.title }}</v-list-item-title>
             </v-list-item>

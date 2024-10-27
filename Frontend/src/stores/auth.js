@@ -24,12 +24,13 @@ export const authStore = defineStore(
       user.value = auth_user
     }
 
-    function logout() {
-      if (token.value && user.value) {
+    function logout(message = null, color = null) {
+      if (token.value || user.value) {
         token.value = null
         user.value = null
         router.push({ name: 'login' })
-        notification.notify('Successfully logged out!')
+        message = typeof message != 'string' ? 'Successfully logged out!' : message
+        notification.notify(message, color)
       }
     }
 

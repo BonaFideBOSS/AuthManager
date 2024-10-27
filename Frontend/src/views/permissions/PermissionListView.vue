@@ -33,15 +33,16 @@
   >
     <template v-slot:prepend>
       <template v-if="actionsManyAllowed">
-        <v-tooltip
-          open-on-click
-          text="Delete selected permissions"
+        <DataTableActionButton
           v-if="canDeleteMany && selectedPermissions.length > 0"
-        >
-          <template v-slot:activator="{ props }">
-            <v-btn :disabled="isLoading" icon="$delete" @click="deleteMany" v-bind="props" />
-          </template>
-        </v-tooltip>
+          tooltip-label="Delete selected permissions"
+          :is-loading="isLoading"
+          @click="deleteMany"
+          icon="$delete"
+          size="default"
+          :change-color-on-hover="false"
+        />
+
         <v-divider
           v-if="selectedPermissions.length > 0"
           class="mx-3 align-self-center"
@@ -78,32 +79,21 @@
   >
     <template v-slot:item.actions="{ item }">
       <div class="text-no-wrap">
-        <v-hover v-if="canUpdate">
-          <template v-slot:default="{ isHovering, props }">
-            <v-btn
-              :disabled="isLoading"
-              v-bind="props"
-              :color="isHovering ? 'primary' : ''"
-              icon="$edit"
-              @click="editPermission(item)"
-              variant="text"
-              size="small"
-            />
-          </template>
-        </v-hover>
-        <v-hover v-if="canDelete">
-          <template v-slot:default="{ isHovering, props }">
-            <v-btn
-              :disabled="isLoading"
-              v-bind="props"
-              :color="isHovering ? 'red-accent-4' : ''"
-              icon="$delete"
-              @click="deletePermission(item)"
-              variant="text"
-              size="small"
-            />
-          </template>
-        </v-hover>
+        <DataTableActionButton
+          v-if="canUpdate"
+          tooltip-label="Edit"
+          :is-loading="isLoading"
+          @click="editPermission(item)"
+          icon="$edit"
+        />
+        <DataTableActionButton
+          v-if="canDelete && !item.deleted"
+          tooltip-label="Delete"
+          :is-loading="isLoading"
+          @click="deletePermission(item)"
+          icon="$delete"
+          color-on-hover="red"
+        />
       </div>
     </template>
 
@@ -175,10 +165,10 @@ import { useDate } from 'vuetify/lib/framework.mjs'
 
 import apis from '@/apis'
 import { authStore } from '@/stores/auth'
-import { notificationStore } from '@/stores/notification'
 import { canTakeActions, timelapse } from '@/utils'
 import DataTableToolbar from '@/components/DataTableToolbar.vue'
 import DataTablePagination from '@/components/DataTablePagination.vue'
+import DataTableActionButton from '@/components/DataTableActionButton.vue'
 import SearchField from '@/components/SearchField.vue'
 
 import PermissionDialog from './PermissionDialog.vue'
@@ -187,7 +177,6 @@ import RoleSelectField from '@/views/users/RoleSelectField.vue'
 
 const route = useRoute()
 const auth = authStore()
-const notification = notificationStore()
 const date = useDate()
 
 const isLoading = ref(false)

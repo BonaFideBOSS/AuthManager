@@ -13,6 +13,7 @@
     items-visibility-label="roles"
     :items-visibility-count="1"
     v-bind="props"
+    :loading="isLoading"
   />
 </template>
 
@@ -30,6 +31,7 @@ const roles = defineModel()
 const props = defineProps({})
 
 const roleList = ref([])
+const isLoading = ref(true)
 
 function getRoles(page = 1, limit = 100) {
   var params = { page: page, limit: limit }
@@ -39,6 +41,9 @@ function getRoles(page = 1, limit = 100) {
     .then((data) => {
       roleList.value.push(...data.data)
       if (data.pagination.filtered > roleList.value.length) getRoles(page + 1)
+    })
+    .then(() => {
+      isLoading.value = false
     })
 }
 
