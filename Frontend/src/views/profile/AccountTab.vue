@@ -41,7 +41,8 @@
               <v-list-item
                 v-for="i in Object.entries({
                   'Created at': auth.user.created_at,
-                  'Updated at': auth.user.updated_at
+                  'Updated at': auth.user.updated_at,
+                  'Last logged-in at': auth.user.last_login_at
                 })"
                 :key="i.at(0)"
               >
@@ -49,7 +50,11 @@
                   <span>{{ i.at(0) }}</span>
                 </template>
                 <template v-slot:append>
-                  <v-tooltip open-on-click location="left" :text="date.format(i.at(1), 'fullDateTime12h')">
+                  <v-tooltip
+                    open-on-click
+                    location="left"
+                    :text="date.format(i.at(1), 'fullDateTime12h')"
+                  >
                     <template v-slot:activator="{ props }">
                       <span v-bind="props" v-text="timelapse(i.at(1))"></span>
                     </template>

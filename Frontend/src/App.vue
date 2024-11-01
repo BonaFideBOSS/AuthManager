@@ -34,7 +34,7 @@ window.fetch = async (...args) => {
       if (!message) message = 'Failed to get a proper response from the server'
       notification.notify(message, 'error')
       if (response.status == 401) {
-        setTimeout(() => auth.logout('Session expired', 'info'), 500)
+        setTimeout(() => auth.logout('Session expired', 'error'), 500)
       }
       if (response.status == 403) {
         setTimeout(() => {

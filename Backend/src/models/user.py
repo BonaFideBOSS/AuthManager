@@ -19,6 +19,7 @@ class User(BaseModel):
     password: Mapped[str] = mapped_column(String(255))
     deleted: Mapped[bool] = mapped_column(default=False)
     deleted_at: Mapped[Optional[datetime]]
+    last_login_at: Mapped[Optional[datetime]]
     roles = relationship("Role",
                          secondary="user_roles",
                          back_populates='users')

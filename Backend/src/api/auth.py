@@ -41,6 +41,10 @@ def login(form: LoginForm = Depends(), db: Session = Depends(get_db)):
         if not user:
             raise ValueError("Invalid credentials")
 
+        user_controller = UserController(db=db)
+        user = user_controller.update_last_login(user)
+        print('last_login', user.last_login_at)
+
         perms = [perm.name for role in user.roles for perm in role.permissions]
         data = {
             "user_id": user.id,

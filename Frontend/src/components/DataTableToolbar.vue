@@ -12,11 +12,18 @@
       <template v-slot:activator="{ props: menu }">
         <v-tooltip text="Show/Hide Columns">
           <template v-slot:activator="{ props: tooltip }">
-            <v-btn
-              :icon="mdiTableHeadersEye"
-              v-bind="mergeProps(menu, tooltip)"
-              :disabled="isLoading"
-            />
+            <v-badge
+              :content="`${selectedHeaders.length}/${columns.length}`"
+              :offset-x="10"
+              :offset-y="10"
+              :model-value="selectedHeaders.length != columns.length"
+            >
+              <v-btn
+                v-bind="mergeProps(menu, tooltip)"
+                :disabled="isLoading"
+                :icon="mdiTableHeadersEye"
+              />
+            </v-badge>
           </template>
         </v-tooltip>
       </template>
@@ -35,13 +42,24 @@
       </v-list>
     </v-menu>
 
+    <v-tooltip text="Toggle Density" open-on-click>
+      <template v-slot:activator="{ props }">
+        <v-btn
+          :disabled="isLoading"
+          :icon="mdiLandRowsHorizontal"
+          @click="changeDensity"
+          v-bind="props"
+        />
+      </template>
+    </v-tooltip>
+
     <slot name="append"></slot>
   </v-toolbar>
 </template>
 
 <script setup>
-import { mergeProps, onMounted, ref, watch } from 'vue'
-import { mdiTableHeadersEye } from '@mdi/js'
+import { mergeProps, onMounted, ref, watch, nextTick } from 'vue'
+import { mdiLandRowsHorizontal, mdiTableHeadersEye } from '@mdi/js'
 
 import SelectAllToggler from '@/components/SelectAllToggler.vue'
 
@@ -51,16 +69,50 @@ const props = defineProps({
   columns: { default: [] }
 })
 
-const headers = defineModel()
+const headers = defineModel('headers')
+const density = defineModel('density', { default: 'default' })
 const selectedHeaders = ref([])
 
+function getMatchingIndexes(list1, list2) {
+  return list1
+    .map((item, index) => {
+      const isInList2 = list2.findIndex((item2) => item.key === item2.key) !== -1
+      return isInList2 ? index : -1
+    })
+    .filter((index) => index !== -1)
+}
+
 onMounted(() => {
-  selectedHeaders.value = [...Array(props.columns.length).keys()]
+  if (headers.value) {
+    selectedHeaders.value = getMatchingIndexes(props.columns, headers.value)
+  } else {
+    selectedHeaders.value = [...Array(props.columns.length).keys()]
+  }
 })
 
 watch(selectedHeaders, (val) => {
   headers.value = props.columns.filter((_, i) => val.includes(i))
 })
+
+const colDensities = { default: 'px-4', comfortable: 'px-3', compact: 'px-1' }
+
+function changeDensity() {
+  if (!density.value) density.value = 'default'
+  else if (density.value == 'default') density.value = 'comfortable'
+  else if (density.value == 'comfortable') density.value = 'compact'
+  else if (density.value == 'compact') density.value = 'default'
+
+  nextTick(() => {
+    const colDensity = colDensities[density.value]
+    headers.value.forEach((col) => {
+      const alignClasses = col.align
+        ? col.align.split(' ').filter((cls) => !cls.startsWith('px'))
+        : []
+      alignClasses.push(` ${colDensity}`)
+      col.align = alignClasses.join(' ')
+    })
+  })
+}
 </script>
 
 <style scoped></style>

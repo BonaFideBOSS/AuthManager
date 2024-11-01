@@ -6,7 +6,12 @@
       <UserMenu v-if="!isMobile" />
     </v-app-bar>
 
-    <v-navigation-drawer color="grey-darken-4" v-model="navbarOpened" :rail="rail" :scrim="false">
+    <v-navigation-drawer
+      color="grey-darken-4"
+      v-model="navbarOpened"
+      :rail="settings.navRail"
+      :scrim="false"
+    >
       <UserInfoListItem v-if="isMobile" />
       <v-divider />
       <v-list class="d-flex flex-column ga-1">
@@ -57,6 +62,7 @@ import { useDisplay } from 'vuetify'
 import { mdiAccount } from '@mdi/js'
 
 import { authStore } from '@/stores/auth'
+import { settingsStore } from '@/stores/settings'
 import UserMenu from '@/composables/UserMenu.vue'
 import UserInfoListItem from '@/composables/UserInfoListItem.vue'
 import ThemeSwitcher from '@/composables/ThemeSwitcher.vue'
@@ -64,11 +70,11 @@ import LogoutButton from '@/composables/LogoutButton.vue'
 
 const display = useDisplay()
 const auth = authStore()
+const settings = settingsStore()
 const router = useRouter()
 
 const isMobile = computed(() => display.mobile.value)
 const navbarOpened = ref(!isMobile.value)
-const rail = ref(false)
 
 const routes = router
   .getRoutes()
@@ -78,9 +84,9 @@ const routes = router
 
 function expandNav() {
   if (isMobile.value) {
-    rail.value = false
+    settings.navRail = false
     navbarOpened.value = !navbarOpened.value
-  } else rail.value = !rail.value
+  } else settings.navRail = !settings.navRail
 }
 </script>
 

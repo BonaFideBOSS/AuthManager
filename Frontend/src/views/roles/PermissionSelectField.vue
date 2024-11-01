@@ -12,6 +12,7 @@
     :multiple="true"
     items-visibility-label="permissions"
     v-bind="props"
+    :loading="isLoading && showLoader"
   />
 </template>
 
@@ -26,9 +27,10 @@ import AutoComplete from '@/components/AutoComplete.vue'
 const auth = authStore()
 const permissions = defineModel()
 
-const props = defineProps({})
+const props = defineProps({ showLoader: { default: false } })
 
 const permissionList = ref([])
+const isLoading = ref(true)
 
 function getPermissions(page = 1, limit = 100) {
   var params = { page: page, limit: limit }
@@ -38,6 +40,9 @@ function getPermissions(page = 1, limit = 100) {
     .then((data) => {
       permissionList.value.push(...data.data)
       if (data.pagination.filtered > permissionList.value.length) getPermissions(page + 1)
+    })
+    .then(() => {
+      isLoading.value = false
     })
 }
 

@@ -13,7 +13,7 @@
     items-visibility-label="roles"
     :items-visibility-count="1"
     v-bind="props"
-    :loading="isLoading"
+    :loading="isLoading && showLoader"
   />
 </template>
 
@@ -28,7 +28,7 @@ import AutoComplete from '@/components/AutoComplete.vue'
 const auth = authStore()
 const roles = defineModel()
 
-const props = defineProps({})
+const props = defineProps({ showLoader: { default: false } })
 
 const roleList = ref([])
 const isLoading = ref(true)

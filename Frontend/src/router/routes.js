@@ -1,7 +1,7 @@
 import apis from '@/apis'
 import AuthLayout from '@/layouts/AuthLayout.vue'
 import MainLayout from '@/layouts/MainLayout.vue'
-import { mdiAccount, mdiAccountLock, mdiAccountMultiple, mdiLock } from '@mdi/js'
+import { mdiAccount, mdiAccountLock, mdiAccountMultiple, mdiLock, mdiViewDashboard } from '@mdi/js'
 
 const routes = [
   {
@@ -9,7 +9,7 @@ const routes = [
     name: 'dashboard',
     meta: {
       title: 'Dashboard',
-      icon: '$home',
+      icon: mdiViewDashboard,
       layout: MainLayout,
       authRequired: true,
       displayOnNav: true

@@ -19,7 +19,7 @@
 </template>
 
 <script setup>
-import { mdiBell } from '@mdi/js'
+import { mdiBell, mdiCancel, mdiThumbUp } from '@mdi/js'
 
 const show = defineModel()
 
@@ -29,7 +29,13 @@ defineProps({
   timeout: { default: 5000 }
 })
 
-const icons = { success: '$success', error: '$cancel', info: '$info', warning: '$warning' }
+const icons = {
+  success: '$success',
+  error: mdiCancel,
+  info: '$info',
+  warning: '$warning',
+  secondary: mdiThumbUp
+}
 </script>
 
 <style scoped></style>

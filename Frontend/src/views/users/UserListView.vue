@@ -38,7 +38,8 @@
   </v-row>
 
   <DataTableToolbar
-    v-model="headers"
+    v-model:headers="dataStore.data.userHeaders"
+    v-model:density="dataStore.data.userDensity"
     :is-loading="isLoading"
     :refresh-action="getUsers"
     :columns="columns"
@@ -66,7 +67,8 @@
 
   <v-data-table-server
     loading-text="loading users..."
-    :headers="headers"
+    :headers="dataStore.data.userHeaders"
+    :density="dataStore.data.userDensity"
     :items="data"
     :items-length="filtered"
     v-model="selectedUsers"
@@ -89,6 +91,7 @@
           :is-loading="isLoading"
           @click="editUser(item)"
           icon="$edit"
+          :density="dataStore.data.userDensity"
         />
         <DataTableActionButton
           v-if="canDelete && !item.deleted"
@@ -97,28 +100,32 @@
           @click="deleteUser(item)"
           icon="$delete"
           color-on-hover="red"
+          :density="dataStore.data.userDensity"
         />
       </div>
     </template>
 
     <template v-slot:item.username="{ value }">
       <div class="text-no-wrap">
-        <v-avatar :image="`${apis.userAvatarURL}/${value.avatar}`" start />
+        <v-avatar
+          :image="`${apis.userAvatarURL}/${value.avatar}`"
+          start
+          :density="dataStore.data.userDensity"
+        />
         <span class="font-weight-medium" v-text="value.username"></span>
       </div>
     </template>
 
     <template v-slot:item.roles="{ value }">
-      <div class="d-flex flex-wrap ga-1 my-1">
-        <v-chip
-          v-for="role in value"
-          :key="role.id"
-          :color="role.color"
-          density="compact"
-          :text="role.name"
-        />
-        <span v-if="value.length == 0">-</span>
-      </div>
+      <ChipsGroup
+        :items="value"
+        item-key="id"
+        title-key="name"
+        color-key="color"
+        label="role"
+        display-limit="2"
+        :density="dataStore.data.userDensity"
+      />
     </template>
 
     <template v-slot:item.created_at="{ value }">
@@ -133,6 +140,14 @@
         {{ timelapse(value) }}
         <v-tooltip activator="parent" :text="date.format(value, 'fullDateTime12h')" open-on-click />
       </span>
+    </template>
+
+    <template v-slot:item.last_login_at="{ value }">
+      <span class="text-no-wrap" v-if="value">
+        {{ timelapse(value) }}
+        <v-tooltip activator="parent" :text="date.format(value, 'fullDateTime12h')" open-on-click />
+      </span>
+      <span v-else>Never</span>
     </template>
 
     <template v-slot:item.deleted="{ item }">
@@ -174,18 +189,20 @@
 </template>
 
 <script setup>
-import { ref, watchEffect } from 'vue'
+import { ref, watch, watchEffect } from 'vue'
 import { useRoute } from 'vue-router'
 import { useDate } from 'vuetify/lib/framework.mjs'
 import { mdiDeleteSweepOutline } from '@mdi/js'
 
 import apis from '@/apis'
 import { authStore } from '@/stores/auth'
+import { preferenceStore } from '@/stores/preference'
 import { canTakeActions, timelapse } from '@/utils'
 import DataTableToolbar from '@/components/DataTableToolbar.vue'
 import DataTablePagination from '@/components/DataTablePagination.vue'
 import DataTableActionButton from '@/components/DataTableActionButton.vue'
 import SearchField from '@/components/SearchField.vue'
+import ChipsGroup from '@/components/ChipsGroup.vue'
 
 import UserDialog from './UserDialog.vue'
 import UserDeleteDialog from './UserDeleteDialog.vue'
@@ -194,9 +211,9 @@ import RoleSelectField from './RoleSelectField.vue'
 const route = useRoute()
 const auth = authStore()
 const date = useDate()
+const dataStore = preferenceStore()
 
 const isLoading = ref(false)
-const headers = ref([])
 const data = ref([])
 const total = ref(0)
 const filtered = ref(0)
@@ -219,6 +236,7 @@ const columns = ref([
   { title: 'Roles', key: 'roles', sortable: false },
   { title: 'Created at', key: 'created_at' },
   { title: 'Updated at', key: 'updated_at' },
+  { title: 'Last Login', key: 'last_login_at' },
   { title: 'Deleted', key: 'deleted' }
 ])
 

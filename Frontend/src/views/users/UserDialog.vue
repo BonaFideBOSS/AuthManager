@@ -68,7 +68,11 @@
             </v-col>
 
             <v-col cols="12" sm="6">
-              <RoleSelectField v-model="roles.value.value" :disabled="isLoading" />
+              <RoleSelectField
+                v-model="roles.value.value"
+                :disabled="isLoading"
+                :show-loader="true"
+              />
             </v-col>
           </v-row>
 
@@ -126,7 +130,7 @@ const { handleSubmit, handleReset, setValues } = useForm({
   validationSchema: {
     email: 'required|email',
     username: 'required|min:4,max:16',
-    password: 'required|min:6'
+    password: 'min:6'
   }
 })
 

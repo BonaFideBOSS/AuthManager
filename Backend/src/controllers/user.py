@@ -133,20 +133,31 @@ class UserController:
 
             # Update user roles
             if hasattr(new_details, 'roles'):
-                # Remove all existing user roles
+                new_role_ids = [id for id in new_details.roles or []]
+                made_changes = False
+
+                # Remove old roles that are not in new role list
                 user_roles = self.db.query(UserRole).filter(
                     UserRole.user_id == user.id).all()
                 for role in user_roles:
-                    self.db.delete(role)
+                    if role.role_id in new_role_ids:
+                        new_role_ids.remove(role.role_id)
+                    else:
+                        made_changes = True
+                        self.db.delete(role)
+
                 # Add new roles
-                for role_id in new_details.roles or []:
+                for role_id in new_role_ids:
                     role = self.db.query(Role).filter(
                         Role.id == role_id).first()
                     if not role:
                         raise ValueError(f"Role with id '{role_id}' not found")
                     user_role = UserRole(user_id=user.id, role_id=role.id)
                     self.db.add(user_role)
-                user.updated_at = datetime.now(timezone.utc)
+                    made_changes = True
+
+                if made_changes:
+                    user.updated_at = datetime.now(timezone.utc)
 
             self.db.commit()
             self.db.refresh(user)
@@ -180,6 +191,19 @@ class UserController:
                 user.deleted_at = datetime.now(timezone.utc)
             self.db.commit()
             return users
+        except Exception as e:
+            self.db.rollback()
+            raise ValueError(str(e)) from e
+
+    def update_last_login(self, user: User):
+        """Update user's last login details"""
+        try:
+            last_updated_at = user.updated_at
+            user.last_login_at = datetime.now(timezone.utc)
+            self.db.flush()
+            user.updated_at = last_updated_at
+            self.db.commit()
+            return user
         except Exception as e:
             self.db.rollback()
             raise ValueError(str(e)) from e

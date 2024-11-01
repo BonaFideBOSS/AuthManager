@@ -24,7 +24,7 @@ export const authStore = defineStore(
       user.value = auth_user
     }
 
-    function logout(message = null, color = null) {
+    function logout(message = null, color = 'secondary') {
       if (token.value || user.value) {
         token.value = null
         user.value = null

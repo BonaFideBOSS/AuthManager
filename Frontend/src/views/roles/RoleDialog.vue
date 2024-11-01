@@ -56,7 +56,11 @@
             </template>
           </v-select>
 
-          <PermissionSelectField v-model="permissions.value.value" :disabled="isLoading" />
+          <PermissionSelectField
+            v-model="permissions.value.value"
+            :disabled="isLoading"
+            :show-loader="true"
+          />
         </v-card-text>
 
         <v-divider></v-divider>

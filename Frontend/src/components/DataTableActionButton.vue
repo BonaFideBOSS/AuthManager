@@ -11,6 +11,7 @@
             :icon="icon"
             @click="onClick"
             :size="size"
+            :density="density"
           />
         </template>
       </v-tooltip>
@@ -28,7 +29,8 @@ defineProps({
   colorOnHover: { default: 'primary' },
   onClick: {},
   icon: {},
-  size: { default: 'small' }
+  size: { default: 'small' },
+  density: { default: 'default' }
 })
 </script>
 

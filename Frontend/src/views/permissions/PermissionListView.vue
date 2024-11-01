@@ -26,7 +26,8 @@
   </v-row>
 
   <DataTableToolbar
-    v-model="headers"
+    v-model:headers="dataStore.data.permissionHeaders"
+    v-model:density="dataStore.data.permissionDensity"
     :is-loading="isLoading"
     :refresh-action="getPermissions"
     :columns="columns"
@@ -62,7 +63,8 @@
 
   <v-data-table-server
     loading-text="loading permissions..."
-    :headers="headers"
+    :headers="dataStore.data.permissionHeaders"
+    :density="dataStore.data.permissionDensity"
     :items="data"
     :items-length="filtered"
     v-model="selectedPermissions"
@@ -85,6 +87,7 @@
           :is-loading="isLoading"
           @click="editPermission(item)"
           icon="$edit"
+          :density="dataStore.data.permissionDensity"
         />
         <DataTableActionButton
           v-if="canDelete && !item.deleted"
@@ -93,29 +96,28 @@
           @click="deletePermission(item)"
           icon="$delete"
           color-on-hover="red"
+          :density="dataStore.data.permissionDensity"
         />
       </div>
     </template>
 
     <template v-slot:item.roles="{ value }">
-      <v-menu open-on-hover open-on-click>
-        <template v-slot:activator="{ props }">
-          <v-chip v-bind="props" link>{{ value.length }}</v-chip>
-        </template>
-
-        <v-card max-width="300" max-height="300" rounded="lg">
-          <v-card-text>{{ value.length }} roles</v-card-text>
-          <v-card-text class="d-flex flex-wrap ga-1 pt-0" v-if="value.length > 0">
-            <v-chip v-for="role in value" :key="role.id">
-              {{ role.name }}
-            </v-chip>
-          </v-card-text>
-        </v-card>
-      </v-menu>
+      <ChipsGroup
+        :items="value"
+        item-key="id"
+        title-key="name"
+        color-key="color"
+        label="role"
+        :density="dataStore.data.permissionDensity"
+      />
     </template>
 
     <template v-slot:item.name="{ value }">
-      <v-chip class="text-no-wrap font-weight-medium" density="comfortable" :text="value" />
+      <v-chip
+        class="text-no-wrap font-weight-medium"
+        :density="dataStore.data.permissionDensity"
+        :text="value"
+      />
     </template>
 
     <template v-slot:item.created_at="{ value }">
@@ -165,11 +167,13 @@ import { useDate } from 'vuetify/lib/framework.mjs'
 
 import apis from '@/apis'
 import { authStore } from '@/stores/auth'
+import { preferenceStore } from '@/stores/preference'
 import { canTakeActions, timelapse } from '@/utils'
 import DataTableToolbar from '@/components/DataTableToolbar.vue'
 import DataTablePagination from '@/components/DataTablePagination.vue'
 import DataTableActionButton from '@/components/DataTableActionButton.vue'
 import SearchField from '@/components/SearchField.vue'
+import ChipsGroup from '@/components/ChipsGroup.vue'
 
 import PermissionDialog from './PermissionDialog.vue'
 import PermissionDeleteDialog from './PermissionDeleteDialog.vue'
@@ -178,9 +182,9 @@ import RoleSelectField from '@/views/users/RoleSelectField.vue'
 const route = useRoute()
 const auth = authStore()
 const date = useDate()
+const dataStore = preferenceStore()
 
 const isLoading = ref(false)
-const headers = ref([])
 const data = ref([])
 const total = ref(0)
 const filtered = ref(0)

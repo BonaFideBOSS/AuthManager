@@ -13,11 +13,11 @@ class UserRead(UserBase):
     avatar: str
     username: str
     email: str
-    password: str
     deleted: bool
     created_at: datetime
     updated_at: datetime
     deleted_at: Optional[datetime] = None
+    last_login_at: Optional[datetime] = None
 
 
 class UserCreate(UserBase):
